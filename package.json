@@ -1,0 +1,58 @@
+{
+  "name": "rag-data-pipeline",
+  "version": "0.0.1",
+  "description": "RAG Data Pipeline for managing and processing data for retrieval-augmented generation applications.",
+  "homepage": "https://github.com/DeDevsClub/rag-data-pipeline",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DeDevsClub/rag-data-pipeline.git"
+  },
+  "author": "DeDevsClub",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "ts-node src/scripts/test.ts",
+    "seed": "ts-node src/scripts/seed.ts",
+    "update": "ts-node src/scripts/update.ts",
+    "reset": "ts-node src/scripts/reset.ts",
+    "start:api": "ts-node src/server.ts",
+    "query": "ts-node src/scripts/query.ts"
+  },
+  "keywords": [
+    "dedevsclub",
+    "rag-data-pipeline",
+    "typescript",
+    "nodejs"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@ai-sdk/openai": "^1.3.22",
+    "@ai-sdk/react": "^1.2.12",
+    "@datastax/astra-db-ts": "^2.0.1",
+    "@langchain/community": "^0.3.47",
+    "@langchain/textsplitters": "^0.1.0",
+    "@types/express": "^5.0.3",
+    "ai": "^4.3.16",
+    "axios": "^1.10.0",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "jsdom": "^26.1.0",
+    "langchain": "^0.3.29",
+    "next": "^15.3.4",
+    "openai": "^5.8.0",
+    "puppeteer": "^24.10.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^21.1.7",
+    "@types/node": "^22.15.33",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
