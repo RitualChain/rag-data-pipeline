@@ -42,7 +42,7 @@ class OpenAIEmbeddingAdapter implements EmbeddingModel {
       this.dimensions = 3072;
     } else {
       console.warn(`Unknown dimensions for embedding model ${modelName}. Defaulting to 1536. Please verify.`);
-      this.dimensions = 1536; // Default or throw error
+      this.dimensions = 1536; // Default for text-embedding-3-small
     }
   }
 
