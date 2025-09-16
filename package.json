@@ -2,12 +2,12 @@
   "name": "rag-data-pipeline",
   "version": "0.0.1",
   "description": "RAG Data Pipeline for managing and processing data for retrieval-augmented generation applications.",
-  "homepage": "https://github.com/DeDevsClub/rag-data-pipeline",
+  "homepage": "https://github.com/RitualDevs/rag-data-pipeline",
   "repository": {
     "type": "git",
-    "url": "https://github.com/DeDevsClub/rag-data-pipeline.git"
+    "url": "https://github.com/RitualDevs/rag-data-pipeline.git"
   },
-  "author": "DeDevsClub",
+  "author": "Buns Enchantress",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -22,7 +22,7 @@
     "query": "ts-node src/scripts/query.ts"
   },
   "keywords": [
-    "dedevsclub",
+    "ritualdevs",
     "rag-data-pipeline",
     "typescript",
     "nodejs"

@@ -1,11 +1,14 @@
 // scripts/reset.ts
+/** biome-ignore-all lint/style/noNonNullAssertion: <explanation> */
 
 import axios from 'axios';
 import { JSDOM } from 'jsdom';
 import OpenAI from 'openai';
-import { VectorStore, EmbeddingModel, VectorStoreConfig, RagDocument } from '../classes'; // Adjust path as needed
-import { ASTRA_DB_API_ENDPOINT, ASTRA_DB_APPLICATION_TOKEN, ASTRA_DB_COLLECTION, ASTRA_DB_NAMESPACE, OPENAI_API_KEY, OPENAI_EMBEDDING_MODEL_NAME, URLS_TO_PROCESS } from '../constants';
+import type { EmbeddingModel, VectorStoreConfig, RagDocument } from '../classes'; // Adjust path as needed
+import { VectorStore } from '../classes'; // Adjust path as needed
+import { ASTRA_DB_API_ENDPOINT, ASTRA_DB_APPLICATION_TOKEN, ASTRA_DB_COLLECTION, ASTRA_DB_NAMESPACE, OPENAI_API_KEY, OPENAI_EMBEDDING_MODEL_NAME } from '../constants';
 import { DataAPIClient } from '@datastax/astra-db-ts';
+import { getUrlsToProcess } from '../utils/url-loader';
 
 // Validate essential environment variables
 if (!OPENAI_API_KEY) {
@@ -123,10 +126,10 @@ async function main() {
     await db.dropCollection(ASTRA_DB_COLLECTION!);
     console.log(`Collection '${ASTRA_DB_COLLECTION}' deleted successfully.`);
   } catch (error: any) {
-    if (error.message && error.message.includes('does not exist')) {
+    if (error?.message?.includes('does not exist')) {
       console.log(`Collection '${ASTRA_DB_COLLECTION}' does not exist, no need to delete.`);
     } else {
-      console.warn(`Could not delete collection '${ASTRA_DB_COLLECTION}':`, error.message || error);
+      console.warn(`Could not delete collection '${ASTRA_DB_COLLECTION}':`, error?.message || error);
       // Decide if you want to proceed or exit. For a clear script, we might want to proceed.
     }
   }
@@ -143,7 +146,7 @@ async function main() {
     });
     console.log(`Collection '${ASTRA_DB_COLLECTION}' created successfully.`);
   } catch (error: any) {
-    console.error(`Failed to create collection '${ASTRA_DB_COLLECTION}':`, error.message || error);
+    console.error(`Failed to create collection '${ASTRA_DB_COLLECTION}':`, error?.message || error);
     process.exit(1); // Exit if collection creation fails
   }
 
@@ -160,16 +163,17 @@ async function main() {
   console.log('VectorStore initialized with AstraDB provider.');
 
   // 6. Process URLs and prepare documents
-    const allDocuments: RagDocument[] = [];
-  console.log(`\nProcessing ${URLS_TO_PROCESS?.length} URLs...`);
+  const allDocuments: RagDocument[] = [];
+  const urlsToProcess = await getUrlsToProcess();
+  console.log(`\nProcessing ${urlsToProcess.length} URLs from link files...`);
 
-  for (const url of URLS_TO_PROCESS?.split(',') || []) {
+  for (const url of urlsToProcess) {
     try {
       console.log(`\nFetching content from: ${url}`);
       const html = await fetchHtmlContent(url);
       const text = extractTextFromHtml(html);
       console.log(`Extracted text length: ${text.length} characters.`);
-      
+
       if (text.length < 50) { // Arbitrary threshold for meaningful content
         console.warn(`Skipping URL ${url} due to very short extracted text.`);
         continue;
@@ -178,7 +182,7 @@ async function main() {
       const textChunks = chunkText(text, 1000, 200);
       console.log(`Split into ${textChunks.length} chunks.`);
 
-            const documents: RagDocument[] = textChunks.map((chunk, index) => ({
+      const documents: RagDocument[] = textChunks.map((chunk, index) => ({
         id: `${url}#chunk${index}`,
         content: chunk,
         metadata: { source: url, chunkNumber: index + 1 },
@@ -196,7 +200,7 @@ async function main() {
   if (allDocuments.length > 0) {
     console.log(`\nAdding ${allDocuments.length} documents to AstraDB via VectorStore...`);
     try {
-            await vectorStore.addDocuments(allDocuments);
+      await vectorStore.addDocuments(allDocuments);
       console.log(`${allDocuments.length} documents added successfully to collection '${ASTRA_DB_COLLECTION}'.`);
     } catch (error) {
       console.error('Error adding documents to VectorStore:', error);

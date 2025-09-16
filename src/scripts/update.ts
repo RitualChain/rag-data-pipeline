@@ -4,6 +4,7 @@ import { DataAPIClient, Collection } from "@datastax/astra-db-ts";
 import OpenAI from "openai";
 import { PuppeteerWebBaseLoader } from "@langchain/community/document_loaders/web/puppeteer";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter"; // LangChain component for splitting text into chunks
+import { getUrlsToProcess } from "../utils/url-loader";
 
 // --- Environment Variable Setup ---
 const { 
@@ -12,7 +13,6 @@ const {
   ASTRA_DB_NAMESPACE,
   ASTRA_DB_COLLECTION,
   OPENAI_API_KEY,
-  URLS_TO_PROCESS,
 } = process.env;
 
 if (
@@ -20,8 +20,7 @@ if (
   !ASTRA_DB_APPLICATION_TOKEN ||
   !ASTRA_DB_NAMESPACE ||
   !ASTRA_DB_COLLECTION ||
-  !OPENAI_API_KEY ||
-  !URLS_TO_PROCESS
+  !OPENAI_API_KEY
 ) {
   throw new Error(
     "Missing one or more required environment variables for database update."
@@ -137,16 +136,22 @@ const updateDatabase = async (urls: string[]) => {
 };
 
 // --- Main Execution ---
-const urlsToUpdate: string[] = [
-  URLS_TO_PROCESS!,
- 
-];
+async function main() {
+  try {
+    const urlsToUpdate = await getUrlsToProcess();
+    console.log(`Loaded ${urlsToUpdate.length} URLs from link files...`);
 
-if (urlsToUpdate.length === 0) {
-  console.warn("No URLs provided in 'urlsToUpdate' array. Script will exit without processing.");
-} else {
-  updateDatabase(urlsToUpdate)
-    .then(() => console.log("Script finished successfully."))
-    .catch((error) => console.error("An error occurred during the update process:", error));
+    if (urlsToUpdate.length === 0) {
+      console.warn("No URLs found in link files. Script will exit without processing.");
+      return;
+    }
+
+    await updateDatabase(urlsToUpdate);
+    console.log("Script finished successfully.");
+  } catch (error) {
+    console.error("An error occurred during the update process:", error);
+    process.exit(1);
+  }
 }
- 
+
+main();

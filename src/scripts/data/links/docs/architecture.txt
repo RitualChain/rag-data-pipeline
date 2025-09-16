@@ -1,0 +1,7 @@
+https://www.ritualfoundation.org/docs/architecture/evm++
+https://www.ritualfoundation.org/docs/architecture/execution-sidecars
+https://www.ritualfoundation.org/docs/architecture/resonance
+https://www.ritualfoundation.org/docs/architecture/symphony
+https://www.ritualfoundation.org/docs/architecture/scheduled-transactions
+https://www.ritualfoundation.org/docs/architecture/infernet-to-chain
+https://www.ritualfoundation.org/docs/architecture/ritual-to-world

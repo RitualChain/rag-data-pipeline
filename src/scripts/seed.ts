@@ -1,21 +1,17 @@
 // Import necessary modules
+/** biome-ignore-all lint/style/noNonNullAssertion: <explanation> */
 import OpenAI from "openai"; // OpenAI SDK for generating embeddings
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter"; // LangChain component for splitting text into chunks
 import { DataAPIClient } from "@datastax/astra-db-ts"; // DataStax Astra DB client
 import { PuppeteerWebBaseLoader } from "@langchain/community/document_loaders/web/puppeteer"; // LangChain loader for scraping web pages using Puppeteer
-import { ASTRA_DB_API_ENDPOINT, ASTRA_DB_APPLICATION_TOKEN, ASTRA_DB_NAMESPACE, ASTRA_DB_COLLECTION, OPENAI_API_KEY, OPENAI_EMBEDDING_MODEL_NAME, URLS_TO_PROCESS } from "../constants";
+import { ASTRA_DB_API_ENDPOINT, ASTRA_DB_APPLICATION_TOKEN, ASTRA_DB_NAMESPACE, ASTRA_DB_COLLECTION, OPENAI_API_KEY, OPENAI_EMBEDDING_MODEL_NAME } from "../constants";
+import { getUrlsToProcess } from "../utils/url-loader";
 
 // Define the type for similarity metric used in vector search
 type SimilarityMetric = "cosine" | "euclidean" | "dot_product";
 
 // Initialize OpenAI client
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
-
-// Array of URLs to scrape data from
-const docsData = [
-  URLS_TO_PROCESS!,
-  // Add more URLs here if needed
-];
 
 // Initialize DataStax Astra DB client
 const client = new DataAPIClient(ASTRA_DB_APPLICATION_TOKEN); // Use '!' if you are sure the token is always present
@@ -93,8 +89,12 @@ const scrapePage = async (url: string): Promise<string> => {
  * - Inserts the chunks and their embeddings into the Astra DB collection.
  */
 const loadSampleData = async () => {
-  const collection = await db.collection(ASTRA_DB_COLLECTION!);
+  const collection = db.collection(ASTRA_DB_COLLECTION!);
   console.log(`Loading data into collection: ${ASTRA_DB_COLLECTION}`);
+
+  // Get URLs from files instead of environment variable
+  const docsData = await getUrlsToProcess();
+  console.log(`Processing ${docsData.length} URLs from link files...`);
 
   for await (const url of docsData) {
     const content = await scrapePage(url);
