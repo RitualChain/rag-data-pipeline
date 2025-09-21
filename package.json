@@ -19,6 +19,7 @@
     "update": "ts-node src/scripts/update.ts",
     "reset": "ts-node src/scripts/reset.ts",
     "fix-collection": "ts-node src/scripts/fix-collection.ts",
+    "scrape-to-files": "ts-node src/scripts/scrape-to-files.ts",
     "start:api": "ts-node src/server.ts",
     "query": "ts-node src/scripts/query.ts"
   },

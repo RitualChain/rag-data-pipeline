@@ -1,5 +1,3 @@
-https://www.ritualfoundation.org/docs/using-ritual/ritual-for-users
-https://www.ritualfoundation.org/docs/using-ritual/ritual-for-node-runners
 https://www.ritualfoundation.org/docs/build-on-ritual/tutorials/lending-protocols
 https://www.ritualfoundation.org/docs/build-on-ritual/tutorials/smart-agents
 https://www.ritualfoundation.org/docs/build-on-ritual/tutorials/automated-prediction-markets

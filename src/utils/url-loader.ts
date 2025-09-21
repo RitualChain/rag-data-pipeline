@@ -6,42 +6,7 @@ import path from 'node:path';
  * @param linksDir Path to the links directory
  * @returns Array of URLs found in all text files
  */
-// export async function loadUrlsFromFiles(linksDir: string = path.join(__dirname, '../scripts/data/links')): Promise<string[]> {
-//     const urls: string[] = [];
-
-//     try {
-//         // Read all subdirectories and files in the links directory
-//         const entries = await fs.promises.readdir(linksDir, { withFileTypes: true });
-
-//         for (const entry of entries) {
-//             const fullPath = path.join(linksDir, entry.name);
-
-//             if (entry.isDirectory()) {
-//                 // Recursively read URLs from subdirectories
-//                 const subDirUrls = await loadUrlsFromFiles(fullPath);
-//                 urls.push(...subDirUrls);
-//             } else if (entry.isFile() && entry.name.endsWith('.txt')) {
-//                 // Read URLs from text files
-//                 const fileContent = await fs.promises.readFile(fullPath, 'utf-8');
-//                 const fileUrls = fileContent
-//                     .split('\n')
-//                     .map(line => line.trim())
-//                     .filter(line => line?.startsWith('http'));
-
-//                 urls.push(...fileUrls);
-//                 console.log(`Loaded ${fileUrls.length} URLs from ${entry.name}`);
-//             }
-//         }
-
-//         console.log(`Total URLs loaded: ${urls.length}`);
-//         return urls;
-//     } catch (error) {
-//         console.error('Error loading URLs from files:', error);
-//         throw error;
-//     }
-// }
-
-export async function loadUrlsFromArchitecture(linksDir: string = path.join(__dirname, '../scripts/data/links/architecture')): Promise<string[]> {
+export async function loadUrlsFromFiles(linksDir: string = path.join(__dirname, '../scripts/data/links')): Promise<string[]> {
     const urls: string[] = [];
 
     try {
@@ -53,7 +18,7 @@ export async function loadUrlsFromArchitecture(linksDir: string = path.join(__di
 
             if (entry.isDirectory()) {
                 // Recursively read URLs from subdirectories
-                const subDirUrls = await loadUrlsFromArchitecture(fullPath);
+                const subDirUrls = await loadUrlsFromFiles(fullPath);
                 urls.push(...subDirUrls);
             } else if (entry.isFile() && entry.name.endsWith('.txt')) {
                 // Read URLs from text files
@@ -83,7 +48,7 @@ export async function loadUrlsFromArchitecture(linksDir: string = path.join(__di
 export async function getUrlsToProcess(): Promise<string[]> {
     try {
         // Try to load URLs from files first
-        const urls = await loadUrlsFromArchitecture();
+        const urls = await loadUrlsFromFiles();
 
         if (urls.length > 0) {
             return urls;

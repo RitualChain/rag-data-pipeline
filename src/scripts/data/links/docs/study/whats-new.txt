@@ -1,6 +1,3 @@
-https://www.ritualfoundation.org/docs/overview/what-is-ritual
-https://www.ritualfoundation.org/docs/landscape/ritual-vs-other-chains
-https://www.ritualfoundation.org/docs/landscape/ritual-vs-other-crypto-x-ai
 https://www.ritualfoundation.org/docs/whats-new/evm++/overview
 https://www.ritualfoundation.org/docs/whats-new/evm++/account-abstraction
 https://www.ritualfoundation.org/docs/whats-new/evm++/scheduled-transactions
@@ -27,11 +24,3 @@ https://www.ritualfoundation.org/docs/whats-new/symphony
 https://www.ritualfoundation.org/docs/whats-new/node-specialization
 https://www.ritualfoundation.org/docs/whats-new/guardians
 https://www.ritualfoundation.org/docs/whats-new/modular-storage
-https://www.ritualfoundation.org/docs/beyond-crypto-x-ai/expressive-blockchains
-https://www.ritualfoundation.org/docs/beyond-crypto-x-ai/prover-networks
-https://www.ritualfoundation.org/docs/beyond-crypto-x-ai/l2-raas
-https://www.ritualfoundation.org/docs/beyond-crypto-x-ai/model-marketplace
-https://www.ritualfoundation.org/docs/roadmap/going
-https://www.ritualfoundation.org/docs/roadmap/not-going
-https://www.ritualfoundation.org/docs/reference/faq#is-ritual-live-today
-https://www.ritualfoundation.org/docs/reference/glossary

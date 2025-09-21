@@ -1,0 +1,2 @@
+https://www.ritualfoundation.org/docs/using-ritual/ritual-for-users
+https://www.ritualfoundation.org/docs/using-ritual/ritual-for-node-runners
