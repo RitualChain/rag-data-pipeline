@@ -71,8 +71,8 @@ const scrapePage = async (url: string): Promise<string | undefined> => {
  */
 const splitText = async (text: string): Promise<string[]> => {
   const splitter = new RecursiveCharacterTextSplitter({
-    chunkSize: 500, // Aim for chunks of this many characters
-    chunkOverlap: 50,  // Overlap chunks to maintain context
+    chunkSize: 1024, // Aim for chunks of this many characters
+    chunkOverlap: 256,  // Overlap chunks to maintain context
   });
   return splitter.splitText(text);
 };

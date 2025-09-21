@@ -21,8 +21,8 @@ const db = client.db(ASTRA_DB_API_ENDPOINT!, {
 
 // Initialize LangChain's text splitter
 const splitter = new RecursiveCharacterTextSplitter({
-  chunkSize: 512,    // Maximum size of each chunk
-  chunkOverlap: 128, // Number of characters to overlap between chunks
+  chunkSize: 1024,    // Maximum size of each chunk
+  chunkOverlap: 256, // Number of characters to overlap between chunks
 });
 
 /**
@@ -34,9 +34,18 @@ const createCollection = async (
   similarityMetric: SimilarityMetric = "dot_product"
 ) => {
   try {
+    // Get the correct dimensions based on the embedding model
+    const embeddingModel = OPENAI_EMBEDDING_MODEL_NAME || 'text-embedding-3-small';
+    let dimension = 1536; // Default for text-embedding-3-small
+    if (embeddingModel === 'text-embedding-3-large') {
+      dimension = 3072;
+    } else if (embeddingModel === 'text-embedding-ada-002' || embeddingModel === 'text-embedding-3-small') {
+      dimension = 1536;
+    }
+    
     const res = await db.createCollection(ASTRA_DB_COLLECTION!, {
       vector: {
-        dimension: 1536, // Dimension of OpenAI's text-embedding-3-small model
+        dimension: dimension, // Use the correct dimension for the configured model
         metric: similarityMetric,
       },
     });
@@ -109,7 +118,7 @@ const loadSampleData = async () => {
     for await (const chunk of chunks) {
       // Generate embedding for the current chunk
       const embedding = await openai.embeddings.create({
-        model: "text-embedding-3-small", // OpenAI embedding model
+        model: OPENAI_EMBEDDING_MODEL_NAME || "text-embedding-3-small", // Use configured embedding model
         input: chunk,
         encoding_format: "float", // Specify float encoding for embeddings
       });
