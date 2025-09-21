@@ -1,8 +1,8 @@
 // src/llm.ts
-import { RagDocument } from './data-loader';
+import type { RagDocument } from './data-loader';
 import OpenAI from 'openai';
-import { Stream } from 'openai/streaming';
-import { ChatCompletionChunk, ChatCompletion } from 'openai/resources/chat/completions';
+import type { Stream } from 'openai/streaming';
+import type { ChatCompletionChunk, ChatCompletion } from 'openai/resources/chat/completions';
 
 // --- Configuration Interfaces ---
 
@@ -54,9 +54,10 @@ export class LLM {
         this.openaiClient = new OpenAI({ apiKey: config.apiKey });
         break;
       // Add cases for other providers
-      default:
+      default: {
         const _exhaustiveCheck = config;
         throw new Error(`Unsupported LLM provider: ${(_exhaustiveCheck as any).provider}`);
+      }
     }
     console.log('LLM initialization complete.');
   }

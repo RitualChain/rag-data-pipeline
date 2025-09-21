@@ -1,7 +1,7 @@
 // src/vector-store.ts
 import { RagDocument } from './data-loader';
 import { DataAPIClient, Collection as AstraCollection } from '@datastax/astra-db-ts';
- 
+
 // --- Configuration Interfaces ---
 export interface EmbeddingModel {
   name: string;
@@ -86,10 +86,10 @@ export class VectorStore {
         }
         break;
       // Add cases for other providers (Pinecone, ChromaDB, etc.)
-      default:
-        // Ensure exhaustive check with a little trick
+      default: {
         const _exhaustiveCheck: never = config;
         throw new Error(`Unsupported vector store provider: ${(_exhaustiveCheck as any).provider}`);
+      }
     }
     console.log('VectorStore initialization complete.');
   }
@@ -97,32 +97,32 @@ export class VectorStore {
   // Helper to ensure Astra collection exists (optional, can be called explicitly)
   private async ensureAstraCollectionExists(config: AstraDBStoreConfig): Promise<void> {
     if (!this.astraCollection || !this.astraClient) {
-        throw new Error('AstraDB client not initialized for ensureAstraCollectionExists.');
+      throw new Error('AstraDB client not initialized for ensureAstraCollectionExists.');
     }
     try {
-        // Check if collection exists - DataAPIClient might not have a direct `listCollections` or `describeCollection`.
-        // A common pattern is to try a read or write and handle errors, or assume it's pre-created.
-        // For robust creation, one might need to use astra-db-ts's admin capabilities if available,
-        // or simply attempt to create it and catch 'already exists' errors.
-        console.log(`Attempting to create AstraDB collection '${config.collectionName}' if not exists (dimension: ${config.embeddingDimension})...`);
-        await this.astraClient.db(config.endpoint, { keyspace: config.keyspace }).createCollection(config.collectionName, {
-            vector: {
-                dimension: config.embeddingDimension,
-                metric: 'cosine', // Or make this configurable
-            },
-        });
-        console.log(`AstraDB collection '${config.collectionName}' ensured/created.`);
+      // Check if collection exists - DataAPIClient might not have a direct `listCollections` or `describeCollection`.
+      // A common pattern is to try a read or write and handle errors, or assume it's pre-created.
+      // For robust creation, one might need to use astra-db-ts's admin capabilities if available,
+      // or simply attempt to create it and catch 'already exists' errors.
+      console.log(`Attempting to create AstraDB collection '${config.collectionName}' if not exists (dimension: ${config.embeddingDimension})...`);
+      await this.astraClient.db(config.endpoint, { keyspace: config.keyspace }).createCollection(config.collectionName, {
+        vector: {
+          dimension: config.embeddingDimension,
+          metric: 'cosine', // Or make this configurable
+        },
+      });
+      console.log(`AstraDB collection '${config.collectionName}' ensured/created.`);
     } catch (e: any) {
-        // It's common for createCollection to throw an error if it already exists with a compatible or incompatible schema.
-        // Error messages/codes from AstraDB would need to be inspected to differentiate.
-        if (e.message && (e.message.includes('already exists') || e.message.includes('E11000 duplicate key error'))) {
-            console.log(`AstraDB collection '${config.collectionName}' already exists.`);
-            // Here you might want to verify if the existing collection's dimension matches config.embeddingDimension.
-            // This is a more advanced check and might require specific AstraDB API calls not directly in DataAPIClient's basic ops.
-        } else {
-            console.error(`Error ensuring/creating AstraDB collection '${config.collectionName}':`, e);
-            throw e; // Re-throw if it's not an 'already exists' type of error
-        }
+      // It's common for createCollection to throw an error if it already exists with a compatible or incompatible schema.
+      // Error messages/codes from AstraDB would need to be inspected to differentiate.
+      if (e.message && (e.message.includes('already exists') || e.message.includes('E11000 duplicate key error'))) {
+        console.log(`AstraDB collection '${config.collectionName}' already exists.`);
+        // Here you might want to verify if the existing collection's dimension matches config.embeddingDimension.
+        // This is a more advanced check and might require specific AstraDB API calls not directly in DataAPIClient's basic ops.
+      } else {
+        console.error(`Error ensuring/creating AstraDB collection '${config.collectionName}':`, e);
+        throw e; // Re-throw if it's not an 'already exists' type of error
+      }
     }
   }
 
@@ -160,7 +160,7 @@ export class VectorStore {
           if (doc.embedding) this.inMemoryStore.set(doc.id, doc);
         }
         break;
-      case 'datastax_astra':
+      case 'datastax_astra': {
         if (!this.astraCollection) throw new Error('AstraDB collection not initialized.');
         const astraDocs = documents
           .filter(doc => doc.embedding) // Ensure embedding exists
@@ -178,9 +178,11 @@ export class VectorStore {
           console.log('No documents with embeddings to insert into AstraDB.');
         }
         break;
-      default:
+      }
+      default: {
         const _exhaustiveCheck: never = this.config;
         throw new Error(`Unsupported provider for addDocuments: ${(_exhaustiveCheck as any).provider}`);
+      }
     }
     console.log(`${documents.length} documents processed for addition.`);
   }
@@ -195,7 +197,7 @@ export class VectorStore {
     console.log(`Performing similarity search in ${this.config.provider} store for top ${topK} results...`);
 
     switch (this.config.provider) {
-      case 'in-memory':
+      case 'in-memory': {
         if (!this.inMemoryStore) throw new Error('In-memory store not initialized.');
         // Basic in-memory search (can be improved with actual cosine similarity)
         const allDocs = Array.from(this.inMemoryStore.values());
@@ -203,8 +205,9 @@ export class VectorStore {
         // For now, it just returns the first topK docs like the original placeholder.
         console.warn('In-memory similarity search is using placeholder logic (returns first K docs).');
         return allDocs.slice(0, topK);
+      }
 
-      case 'datastax_astra':
+      case 'datastax_astra': {
         if (!this.astraCollection) throw new Error('AstraDB collection not initialized.');
         try {
           // Use vector search with explicit $vectorize parameter
@@ -216,15 +219,15 @@ export class VectorStore {
               includeSimilarity: true, // Include similarity scores in results
             },
           );
-          
+
           const astraResults = await cursor.toArray();
           console.log(`Retrieved ${astraResults.length} documents from AstraDB`);
-          
+
           // Debug the retrieved document IDs
           if (astraResults.length > 0) {
             console.log('Retrieved document IDs:', astraResults.map(doc => doc._id));
           }
-          
+
           return astraResults.map((astraDoc: any) => ({
             id: astraDoc._id as string,
             content: astraDoc.text as string,
@@ -236,10 +239,12 @@ export class VectorStore {
           console.error('Error during AstraDB similarity search:', error);
           throw error;
         }
+      }
 
-      default:
+      default: {
         const _exhaustiveCheck: never = this.config;
         throw new Error(`Unsupported provider for similaritySearch: ${(_exhaustiveCheck as any).provider}`);
+      }
     }
   }
 
