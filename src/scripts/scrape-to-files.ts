@@ -6,7 +6,7 @@ import { PuppeteerWebBaseLoader } from "@langchain/community/document_loaders/we
 import { getUrlsToProcess } from "../utils/url-loader";
 
 // Configuration
-const OUTPUT_DIR = path.join(process.cwd(), 'scraped-content');
+const OUTPUT_DIR = path.join(process.cwd(), 'scraped');
 const MAX_FILENAME_LENGTH = 100; // Maximum filename length to avoid filesystem issues
 
 /**
