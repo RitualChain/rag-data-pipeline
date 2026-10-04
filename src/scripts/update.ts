@@ -13,6 +13,7 @@ const {
   ASTRA_DB_NAMESPACE,
   ASTRA_DB_COLLECTION,
   OPENAI_API_KEY,
+  OPENAI_EMBEDDING_MODEL_NAME,
 } = process.env;
 
 if (
@@ -109,7 +110,7 @@ const updateDatabase = async (urls: string[]) => {
       try {
         console.log(`Generating embedding for chunk ${i + 1}/${chunks.length}...`);
         const embeddingResponse = await openaiClient.embeddings.create({
-          model: "text-embedding-3-small",
+          model: OPENAI_EMBEDDING_MODEL_NAME || "text-embedding-3-small",
           input: chunk,
         });
         const embedding = embeddingResponse.data[0].embedding;
